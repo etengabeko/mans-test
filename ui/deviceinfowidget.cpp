@@ -1,8 +1,11 @@
 #include "deviceinfowidget.h"
 #include "ui_deviceinfowidget.h"
 
+#include <deviceinfo/deviceinfo.h>
 #include <deviceinfo/parser.h>
 
+#include <QApplication>
+#include <QCursor>
 #include <QDateTime>
 #include <QListWidget>
 #include <QListWidgetItem>
@@ -12,14 +15,13 @@
 
 namespace {
 
-QString datetimeFormat() { return "yyyy-MM-dd hh:mm:ss.zzz"; }
+QString datetimeFormat() { return "hh:mm:ss.zzz dd.MM.yyyy"; }
 
 }
 
 DeviceInfoWidget::DeviceInfoWidget(QWidget* parent) :
   QWidget(parent),
-  ui_(new Ui::DeviceInfoWidget()),
-  currentDevice_(nullptr)
+  ui_(new Ui::DeviceInfoWidget())
 {
   ui_->setupUi(this);
 
@@ -40,27 +42,31 @@ void DeviceInfoWidget::init(const QString& workDirName)
     return;
   }
 
+  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
   devices_ = DeviceInfoParser::loadFromDir(workDirName);
 
   for (auto it = devices_.constBegin(), end = devices_.constEnd(); it != end; ++it) {
-    ui_->devListWidget->addItem(it->name());
+    ui_->devListWidget->addItem((*it)->name());
   }
 
   if (ui_->devListWidget->count() > 0) {
     ui_->devListWidget->item(0)->setSelected(true);
   }
+
+  QApplication::restoreOverrideCursor();
 }
 
 void DeviceInfoWidget::slotDeviceSelect()
 {
   ui_->portListWidget->clear();
-  currentDevice_ = nullptr;
+  currentDevice_.clear();
 
   if (ui_->devListWidget->selectionModel()->hasSelection() == true) {
     foreach (auto item, ui_->devListWidget->selectedItems()) {
       int row = ui_->devListWidget->row(item);
       if (row < devices_.count()) {
-        currentDevice_ = &(devices_.at(row));
+        currentDevice_ = devices_.at(row);
         for (int i = 0, sz = currentDevice_->portsCount(); i < sz; ++i) {
           ui_->portListWidget->addItem(QString::number(currentDevice_->portAt(i).number()));
         }
@@ -78,7 +84,7 @@ void DeviceInfoWidget::slotPortSelect()
   ui_->receiveTreeWidget->clear();
   ui_->transmitTreeWidget->clear();
 
-  if (   currentDevice_ != nullptr
+  if (   currentDevice_.isNull() == false
       && ui_->portListWidget->selectionModel()->hasSelection() == true) {
     foreach (auto item, ui_->portListWidget->selectedItems()) {
       int row = ui_->portListWidget->row(item);
@@ -89,15 +95,23 @@ void DeviceInfoWidget::slotPortSelect()
   }
 }
 
-void DeviceInfoWidget::loadInfoRecordsForPort(const DeviceInfo::PortInfo& port)
+void DeviceInfoWidget::loadInfoRecordsForPort(const PortInfo& port)
 {
-  loadInfoRecordsForPort(port, ui_->receiveTreeWidget, DeviceInfo::PortInfo::DirectionType::RECEIVE);
-  loadInfoRecordsForPort(port, ui_->transmitTreeWidget, DeviceInfo::PortInfo::DirectionType::TRANSMIT);
+  loadInfoRecordsForPort(port, ui_->receiveTreeWidget);
+  loadInfoRecordsForPort(port, ui_->transmitTreeWidget);
 }
 
-void DeviceInfoWidget::loadInfoRecordsForPort(const DeviceInfo::PortInfo& port, QTreeWidget* target, DeviceInfo::PortInfo::DirectionType type)
+void DeviceInfoWidget::loadInfoRecordsForPort(const PortInfo& port, QTreeWidget* target)
 {
   Q_CHECK_PTR(target);
+
+  PortInfo::DirectionType type = PortInfo::DirectionType::RECEIVE;
+  if (target == ui_->transmitTreeWidget) {
+    type = PortInfo::DirectionType::TRANSMIT;
+  }
+  else if (target == ui_->receiveTreeWidget) {
+    qt_noop();
+  }
 
   for (int i = 1, sz = port.recordsCount(type); i < sz; ++i) {
     qint64 curDt = port.recordAt(type, i).time_;

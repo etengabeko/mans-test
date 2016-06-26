@@ -15,7 +15,7 @@ int DeviceInfo::portsCount() const
   return ports_.count();
 }
 
-const DeviceInfo::PortInfo& DeviceInfo::portAt(int index) const
+const PortInfo& DeviceInfo::portAt(int index) const
 {
   return ports_.at(index);
 }
@@ -25,68 +25,68 @@ void DeviceInfo::addPort(const PortInfo& port)
   ports_.append(port);
 }
 
-DeviceInfo::PortInfo::PortInfo(int num) :
+PortInfo::PortInfo(int num) :
   number_(num)
 {
 }
 
-int DeviceInfo::PortInfo::number() const
+int PortInfo::number() const
 {
   return number_;
 }
 
-bool DeviceInfo::PortInfo::isValid() const
+bool PortInfo::isValid() const
 {
   return number_ > 0;
 }
 
-int DeviceInfo::PortInfo::receiveRecordsCount() const
+int PortInfo::receiveRecordsCount() const
 {
   return recordsCount(DirectionType::RECEIVE);
 }
 
-int DeviceInfo::PortInfo::transmitRecordsCount() const
+int PortInfo::transmitRecordsCount() const
 {
   return recordsCount(DirectionType::TRANSMIT);
 }
 
 
-int DeviceInfo::PortInfo::recordsCount(DirectionType type) const
+int PortInfo::recordsCount(DirectionType type) const
 {
   return records_[type].count();
 }
 
-const DeviceInfo::PortInfo::InfoRecord& DeviceInfo::PortInfo::receiveRecordAt(int index) const
+const PortInfo::InfoRecord& PortInfo::receiveRecordAt(int index) const
 {
   return recordAt(DirectionType::RECEIVE, index);
 }
 
-const DeviceInfo::PortInfo::InfoRecord& DeviceInfo::PortInfo::transmitRecordAt(int index) const
+const PortInfo::InfoRecord& PortInfo::transmitRecordAt(int index) const
 {
   return recordAt(DirectionType::TRANSMIT, index);
 }
 
-const DeviceInfo::PortInfo::InfoRecord& DeviceInfo::PortInfo::recordAt(DirectionType type, int index) const
+const PortInfo::InfoRecord& PortInfo::recordAt(DirectionType type, int index) const
 {
   return records_[type].at(index);
 }
 
-void DeviceInfo::PortInfo::addReceiveRecord(const InfoRecord& record)
+void PortInfo::addReceiveRecord(const InfoRecord& record)
 {
   addRecord(DirectionType::RECEIVE, record);
 }
 
-void DeviceInfo::PortInfo::addTransmitRecord(const InfoRecord& record)
+void PortInfo::addTransmitRecord(const InfoRecord& record)
 {
   addRecord(DirectionType::TRANSMIT, record);
 }
 
-void DeviceInfo::PortInfo::addRecord(DirectionType type, const InfoRecord& record)
+void PortInfo::addRecord(DirectionType type, const InfoRecord& record)
 {
   records_[type].append(record);
 }
 
-DeviceInfo::PortInfo DeviceInfo::PortInfo::merge(const PortInfo& one, const PortInfo& two)
+PortInfo PortInfo::merge(const PortInfo& one, const PortInfo& two)
 {
   if (   one.isValid() == true
       && two.isValid() == true
@@ -111,7 +111,7 @@ DeviceInfo::PortInfo DeviceInfo::PortInfo::merge(const PortInfo& one, const Port
   return PortInfo();
 }
 
-const QMap<QString, DeviceInfo::PortInfo::DirectionType>& DeviceInfo::PortInfo::portSuffixes()
+const QMap<QString, PortInfo::DirectionType>& PortInfo::portSuffixes()
 {
   static QMap<QString, DirectionType> suffixes;
   if (suffixes.isEmpty() == true) {
@@ -122,13 +122,13 @@ const QMap<QString, DeviceInfo::PortInfo::DirectionType>& DeviceInfo::PortInfo::
   return suffixes;
 }
 
-DeviceInfo::PortInfo::InfoRecord::InfoRecord(qint64 time, quint64 bytes) :
+PortInfo::InfoRecord::InfoRecord(qint64 time, quint64 bytes) :
   time_(time),
   bytes_(bytes)
 {
 }
 
-bool operator == (const DeviceInfo::PortInfo::InfoRecord& lhs, const DeviceInfo::PortInfo::InfoRecord& rhs)
+bool operator == (const PortInfo::InfoRecord& lhs, const PortInfo::InfoRecord& rhs)
 {
   return    lhs.time_ == rhs.time_
          && lhs.bytes_ == rhs.bytes_;

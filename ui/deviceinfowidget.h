@@ -1,9 +1,8 @@
 #ifndef MANS_UI_DEVICEINFOWIDGET_H
 #define MANS_UI_DEVICEINFOWIDGET_H
 
-#include <deviceinfo/deviceinfo.h>
-
 #include <QList>
+#include <QSharedPointer>
 #include <QWidget>
 
 class QTreeWidget;
@@ -11,6 +10,9 @@ class QTreeWidget;
 namespace Ui {
   class DeviceInfoWidget;
 } // Ui
+
+class DeviceInfo;
+class PortInfo;
 
 class DeviceInfoWidget : public QWidget
 {
@@ -27,13 +29,13 @@ private slots:
   void slotPortSelect();
 
 private:
-  void loadInfoRecordsForPort(const DeviceInfo::PortInfo& port);
-  void loadInfoRecordsForPort(const DeviceInfo::PortInfo& port, QTreeWidget* target, DeviceInfo::PortInfo::DirectionType type);
+  void loadInfoRecordsForPort(const PortInfo& port);
+  void loadInfoRecordsForPort(const PortInfo& port, QTreeWidget* target);
 
 private:
   Ui::DeviceInfoWidget* ui_;
-  QList<DeviceInfo> devices_;
-  const DeviceInfo* currentDevice_;
+  QList<QSharedPointer<DeviceInfo>> devices_;
+  QSharedPointer<DeviceInfo> currentDevice_;
 
 };
 

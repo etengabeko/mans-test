@@ -51,8 +51,10 @@ int main(int argc, char* argv[])
   }
 
   DeviceInfoWidget wgt;
-  wgt.init(workDirName);
   wgt.show();
+  app.processEvents();
+
+  wgt.init(workDirName);
 
   return app.exec();
 }

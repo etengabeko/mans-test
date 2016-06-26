@@ -5,11 +5,11 @@
 #include <QMap>
 #include <QString>
 
+class PortInfo;
+
 class DeviceInfo
 {
 public:
-  class PortInfo;
-
   DeviceInfo(const QString& devName);
 
   const QString& name() const;
@@ -25,7 +25,7 @@ private:
 
 };
 
-class DeviceInfo::PortInfo
+class PortInfo
 {
 public:
   enum class DirectionType {
@@ -71,6 +71,6 @@ private:
 
 };
 
-bool operator == (const DeviceInfo::PortInfo::InfoRecord& lhs, const DeviceInfo::PortInfo::InfoRecord& rhs);
+bool operator == (const PortInfo::InfoRecord& lhs, const PortInfo::InfoRecord& rhs);
 
 #endif // MANS_DEVICEINFO_DEVICEINFO_H

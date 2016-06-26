@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "deviceinfo.h"
 
 #include <QDir>
 #include <QDebug>
@@ -10,64 +11,63 @@
 #include <QStringList>
 #include <QTextStream>
 
-QList<DeviceInfo> DeviceInfoParser::loadFromDir(const QString& dirName)
+QList<QSharedPointer<DeviceInfo>> DeviceInfoParser::loadFromDir(const QString& dirName)
 {
-  QList<DeviceInfo> result;
+  QList<QSharedPointer<DeviceInfo>> result;
 
   if (dirName.isEmpty() == false) {
     QDir dir(dirName);
     foreach (const QFileInfo& finfo, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-      DeviceInfo devinfo = loadDevice(finfo.absoluteFilePath());
-      if (devinfo.portsCount() > 0) {
+      QSharedPointer<DeviceInfo> devinfo = loadDevice(finfo.absoluteFilePath());
+      if (   devinfo.isNull() == false
+          && devinfo->portsCount() > 0) {
         result.append(devinfo);
       }
     }
   }
-
   return result;
 }
 
-DeviceInfo DeviceInfoParser::loadDevice(const QString& dirName)
+QSharedPointer<DeviceInfo> DeviceInfoParser::loadDevice(const QString& dirName)
 {
   QDir dir(dirName);
-  DeviceInfo result(dir.dirName());
+  QSharedPointer<DeviceInfo> result(new DeviceInfo(dir.dirName()));
 
   QStringList nameFilters;
-  foreach (const QString& sfx, DeviceInfo::PortInfo::portSuffixes().keys()) {
+  foreach (const QString& sfx, PortInfo::portSuffixes().keys()) {
     nameFilters.append(QString("*.%1").arg(sfx));
   }
 
-  QMap<int, QList<DeviceInfo::PortInfo>> allports;
+  QMap<int, QList<PortInfo>> allports;
   foreach (const QFileInfo& finfo, dir.entryInfoList(nameFilters, QDir::Files)) {
-    DeviceInfo::PortInfo pi = loadPort(finfo.absoluteFilePath());
+    PortInfo pi = loadPort(finfo.absoluteFilePath());
     if (pi.isValid() == true) {
       allports[pi.number()].append(pi);
     }
   }
 
   for (auto it = allports.constBegin(), end = allports.constEnd(); it != end; ++it) {
-    const QList<DeviceInfo::PortInfo>& each = it.value();
+    const QList<PortInfo>& each = it.value();
     if (each.count() == 1) {
-      result.addPort(each.first());
+      result->addPort(each.first());
     }
     else if (each.count() > 1) {
-      DeviceInfo::PortInfo merged = each.first();
+      PortInfo merged = each.first();
       for (auto pIt = each.constBegin()+1, pEnd = each.constEnd(); pIt != pEnd; ++pIt) {
-        merged = DeviceInfo::PortInfo::merge(merged, *pIt);
+        merged = PortInfo::merge(merged, *pIt);
       }
-      result.addPort(merged);
+      result->addPort(merged);
     }
   }
-
   return result;
 }
 
-DeviceInfo::PortInfo DeviceInfoParser::loadPort(const QString& fileName)
+PortInfo DeviceInfoParser::loadPort(const QString& fileName)
 {
   QFileInfo fi(fileName);
 
-  DeviceInfo::PortInfo result(fi.baseName().toInt());
-  DeviceInfo::PortInfo::DirectionType type = DeviceInfo::PortInfo::portSuffixes()[fi.completeSuffix()];
+  PortInfo result(fi.baseName().toInt());
+  PortInfo::DirectionType type = PortInfo::portSuffixes()[fi.completeSuffix()];
 
   QFile f(fileName);
   if (f.open(QFile::ReadOnly) == true) {
@@ -81,7 +81,7 @@ DeviceInfo::PortInfo DeviceInfoParser::loadPort(const QString& fileName)
       if (ok == true) {
         quint64 bytes = second.toULongLong(&ok);
         if (ok == true) {
-          result.addRecord(type, DeviceInfo::PortInfo::InfoRecord(time, bytes));
+          result.addRecord(type, PortInfo::InfoRecord(time, bytes));
         }
       }
     }
@@ -89,6 +89,5 @@ DeviceInfo::PortInfo DeviceInfoParser::loadPort(const QString& fileName)
   else {
     qDebug() << QString("%1: %2").arg(fileName).arg(f.errorString());
   }
-
   return result;
 }

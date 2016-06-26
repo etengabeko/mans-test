@@ -1,7 +1,10 @@
 #ifndef MANS_DEVICEINFO_PARSER_H
 #define MANS_DEVICEINFO_PARSER_H
 
-#include "deviceinfo.h"
+#include <QSharedPointer>
+
+class DeviceInfo;
+class PortInfo;
 
 template <typename T> class QList;
 class QString;
@@ -9,11 +12,11 @@ class QString;
 class DeviceInfoParser
 {
 public:
-  static QList<DeviceInfo> loadFromDir(const QString& dirName);
+  static QList<QSharedPointer<DeviceInfo>> loadFromDir(const QString& dirName);
 
 private:
-  static DeviceInfo loadDevice(const QString& dirName);
-  static DeviceInfo::PortInfo loadPort(const QString& fileName);
+  static QSharedPointer<DeviceInfo> loadDevice(const QString& dirName);
+  static PortInfo loadPort(const QString& fileName);
 
 };
 
