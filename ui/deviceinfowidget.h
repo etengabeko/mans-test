@@ -1,7 +1,7 @@
 #ifndef MANS_UI_DEVICEINFOWIDGET_H
 #define MANS_UI_DEVICEINFOWIDGET_H
 
-#include <deviceinfo_parser/deviceinfo.h>
+#include <deviceinfo/deviceinfo.h>
 
 #include <QList>
 #include <QWidget>

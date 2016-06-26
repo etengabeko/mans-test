@@ -1,7 +1,7 @@
 #include "deviceinfowidget.h"
 #include "ui_deviceinfowidget.h"
 
-#include <deviceinfo_parser/parser.h>
+#include <deviceinfo/parser.h>
 
 #include <QDateTime>
 #include <QListWidget>

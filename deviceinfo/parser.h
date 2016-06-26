@@ -1,5 +1,5 @@
-#ifndef MANS_DEVICEINFO_PARSER_PARSER_H
-#define MANS_DEVICEINFO_PARSER_PARSER_H
+#ifndef MANS_DEVICEINFO_PARSER_H
+#define MANS_DEVICEINFO_PARSER_H
 
 #include "deviceinfo.h"
 
@@ -17,4 +17,4 @@ private:
 
 };
 
-#endif // MANS_DEVICEINFO_PARSER_PARSER_H
+#endif // MANS_DEVICEINFO_PARSER_H

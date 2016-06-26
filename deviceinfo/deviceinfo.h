@@ -1,5 +1,5 @@
-#ifndef MANS_DEVICEINFO_PARSER_DEVICEINFO_H
-#define MANS_DEVICEINFO_PARSER_DEVICEINFO_H
+#ifndef MANS_DEVICEINFO_DEVICEINFO_H
+#define MANS_DEVICEINFO_DEVICEINFO_H
 
 #include <QList>
 #include <QMap>
@@ -73,4 +73,4 @@ private:
 
 bool operator == (const DeviceInfo::PortInfo::InfoRecord& lhs, const DeviceInfo::PortInfo::InfoRecord& rhs);
 
-#endif // MANS_DEVICEINFO_PARSER_DEVICEINFO_H
+#endif // MANS_DEVICEINFO_DEVICEINFO_H
