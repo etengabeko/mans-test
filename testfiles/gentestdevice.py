@@ -27,7 +27,7 @@ def get_port_number(max_port_number = 32767):
 def get_random_entry_count(max_entry_count = 20):
     return random.randint(2, max_entry_count)
 
-def get_random_bytes(max_bytes = 1000):
+def get_random_bytes(max_bytes = 1000000):
     return random.randint(0, max_bytes)
 
 def get_random_date(days_before = 7):
@@ -36,6 +36,12 @@ def get_random_date(days_before = 7):
 def get_random_period_msec(max_period_msec = 60*1000):
     return random.randint(0, max_period_msec)
 
+def get_random_microsec_str():
+    mcs = str(random.randint(0, 999))
+    while len(mcs) < 3:
+        mcs = "0" + mcs
+    return mcs
+
 def create_port(device_name, port_number):
     create_port_file(device_name, port_number, ".tx")
     create_port_file(device_name, port_number, ".rx")
@@ -43,10 +49,16 @@ def create_port(device_name, port_number):
 def create_port_file(device_name, port_number, ext):
     fname = device_name + "/" + str(port_number) + ext
     file = open(fname, 'w')
+    dt = get_random_date()
+    for i in range(0, get_random_entry_count()):
+        dt = dt + datetime.timedelta(milliseconds = get_random_period_msec())
+        bts = get_random_bytes()
+        file.write(dt.strftime("%s") + get_random_microsec_str() + " " + str(bts) + "\n")
 
 if __name__ == "__main__":
-    dirname = "./" + get_device_name()
+    devname = get_device_name()
+    dirname = "./" + devname
     os.mkdir(dirname)
-
     for i in range(0, get_random_ports_count()):
         create_port(dirname, get_port_number())
+    print("Created " + devname)
