@@ -15,7 +15,7 @@
 
 namespace {
 
-QString datetimeFormat() { return "hh:mm:ss.zzz dd.MM.yyyy"; }
+QString datetimeFormat() { return "hh:mm:ss dd.MM.yyyy"; }
 
 }
 
@@ -40,6 +40,9 @@ void DeviceInfoWidget::init(const QString& workDirName)
 {
   if (workDirName.isEmpty() == true) {
     return;
+  }
+  else {
+    setWindowTitle(QString("%1 - [%2]").arg(windowTitle()).arg(workDirName));
   }
 
   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -126,7 +129,7 @@ void DeviceInfoWidget::loadInfoRecordsForPort(const PortInfo& port, QTreeWidget*
     fields << QDateTime::fromMSecsSinceEpoch(prevDt).toString(::datetimeFormat())
            << QDateTime::fromMSecsSinceEpoch(curDt).toString(::datetimeFormat())
            << QString::number(duration, 'f', 3)
-           << QString::number(speed, 'f', 3);
+           << QString::number(speed, 'f', 0);
     QTreeWidgetItem* item = new QTreeWidgetItem(target, fields);
     target->addTopLevelItem(item);
   }
