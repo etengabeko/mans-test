@@ -1,20 +1,9 @@
-TEMPLATE = app
-TARGET = mans
+TEMPLATE = subdirs
 
-QT = core  \
-     gui
+include(common.pri)
 
-include(common.pro)
+SUBDIRS += \
+        deviceinfo \
+        ui \
+        app
 
-HEADERS = \
-          deviceinfo/deviceinfo.h    \
-          deviceinfo/parser.h        \
-          ui/deviceinfowidget.h      \
-
-SOURCES = \
-          deviceinfo/deviceinfo.cpp  \
-          deviceinfo/parser.cpp      \
-          ui/deviceinfowidget.cpp    \
-          app/main.cpp
-
-FORMS =   ui/deviceinfowidget.ui
